@@ -46,7 +46,7 @@ void send_data(WiFiClient client)
 int is_animal()
 {
     if (!huskyLens.request()) Serial.println(F("Fail to request data from HUSKYLENS, recheck the connection!"));
-    while (huskyLens.available()) {
+    if (huskyLens.available()) {
     HUSKYLENSResult result = huskyLens.read();
         if (result.ID == ID_PERSON) 
             return 1;
