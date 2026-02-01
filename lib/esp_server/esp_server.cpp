@@ -1,4 +1,8 @@
+#include <Arduino.h>
 #include "esp_server.h"
+#include "HUSKYLENS.h"
+
+HUSKYLENS huskyLens;
 
 WiFiServer server(1234);
 
@@ -11,6 +15,19 @@ void setup_server(const char ssid[MAX_STRING], const char password[MAX_STRING])
     server.begin();
 }
 
+void setup_lens()
+{
+    Wire.begin(21,22);
+
+    while (!huskyLens.begin(Wire))
+    {
+        Serial.println(F("Begin failed!"));
+        delay(100);
+    }
+
+    huskyLens.writeAlgorithm(ALGORITHM_OBJECT_RECOGNITION);
+}
+
 void send_data(WiFiClient client)
 {
     if (client)
@@ -19,14 +36,21 @@ void send_data(WiFiClient client)
 
         while (client.connected())
         {
-            bool data = is_animal();  
+            int data = is_animal();  
             client.print(data);
             delay(100);
         }
     }
 }
 
-bool is_animal()
+int is_animal()
 {
-    return true;
+    if (!huskyLens.request()) Serial.println(F("Fail to request data from HUSKYLENS, recheck the connection!"));
+    while (huskyLens.available()) {
+    HUSKYLENSResult result = huskyLens.read();
+        if (result.ID == ID_PERSON) 
+            return 1;
+        return 0;
+    }
+    return -1;
 }
