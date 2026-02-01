@@ -15,7 +15,7 @@ int get_data()
     if (sock < 0)
     {
         perror("socket");
-        return -1;
+        return -2;
     }
 
     sockaddr_in server_addr{};
@@ -26,13 +26,13 @@ int get_data()
     {
         perror("Invalid address");
         close(sock);
-        return -1;
+        return -2;
     }
 
     if (connect(sock, (sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
         perror("Connection failed");
         close(sock);
-        return -1;
+        return -2;
     }
 
     char buffer[16] = {0};
@@ -40,7 +40,7 @@ int get_data()
     if (bytes_received <= 0) {
         perror("Receive failed");
         close(sock);
-        return -1;
+        return -2;
     }
 
     bool value = false;
